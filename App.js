@@ -1,44 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Button, Alert } from 'react-native';
-import * as Location from 'expo-location'; 
+import React, { useState } from 'react';
+import { StyleSheet, StatusBar, View, TextInput, Button } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default function App() {
-  const [location, setLocation]=useState(null);
-  const [text, setText] = useState(""); 
-  const [pin, setPin] = useState({
-    latitude: 60.200692,
-    longitude: 24.934302,
+  const [text, setText]=useState(""); 
+  const [pin, setPin]=useState({
+      latitude: 60.200692,
+      longitude: 24.934302,
     })
   const [region, setRegion]=useState({
-    latitude: 60.200692,
-    longitude: 24.934302,
-    latitudeDelta: 0.0322,
-    longitudeDelta: 0.0221
+      latitude: 60.200692,
+      longitude: 24.934302,
+      latitudeDelta: 0.0322,
+      longitudeDelta: 0.0221
   })
- 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted'){
-        Alert.alert('No permission for location')
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0322,
-        longitudeDelta: 0.0221
-      })
-    })();
-  }, []);
-
-
+  
   const getAddress = () => {
     fetch(`http://www.mapquestapi.com/geocoding/v1/address?key=3JIT9JdCuHOBuHA8jsz6eLzHUoceyCUT&location=${text}`)
     .then(response => response.json())
     .then(responseData => {
+      console.log(responseData.results[0].locations[0].displayLatLng.lat)
       setRegion({
         latitude: responseData.results[0].locations[0].displayLatLng.lat,
         longitude: responseData.results[0].locations[0].displayLatLng.lng,
@@ -51,12 +32,11 @@ export default function App() {
       })  
     }) 
   } 
-
+  
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={location}
         region={region}
         provider="google"
       >
